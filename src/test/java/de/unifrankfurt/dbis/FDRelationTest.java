@@ -1,11 +1,12 @@
-package de.unifrankfurt.dbis.fd;
+package de.unifrankfurt.dbis;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class FDRelationTest {
 
@@ -35,7 +36,7 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation(key,values);
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> attributes = new HashSet<>();
         attributes.addAll(key);
@@ -59,13 +60,13 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation(key,values);
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDRelation fdr2 = null;
         try {
             fdr2 = new FDRelation(new FDSimpleRelation(key,values));
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         assertEquals(fdr,fdr2);
     }
@@ -79,7 +80,7 @@ public class FDRelationTest {
         try {
             rel = new FDRelation().parse("a->b");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDKey key = new FDKey("a");
         HashSet<String> values = new HashSet<>();
@@ -103,7 +104,7 @@ public class FDRelationTest {
         try {
             rel = new FDRelation().parse("");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         assertEquals(new HashSet<String>(),rel.getAttributes());
     }
@@ -117,7 +118,7 @@ public class FDRelationTest {
         try {
             rel = new FDRelation().parse("a b -> a b"," ");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDKey key = new FDKey("a","b");
         HashSet<String> values = new HashSet<>();
@@ -141,7 +142,7 @@ public class FDRelationTest {
         try {
             rel = new FDRelation().parse("aoboco->od","o");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDKey key = new FDKey("a","b","c");
         HashSet<String> values = new HashSet<>();
@@ -150,7 +151,7 @@ public class FDRelationTest {
         try {
             rel2 = new FDRelation(key,values);
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         assertEquals(rel2, rel);
 
@@ -166,9 +167,9 @@ public class FDRelationTest {
         try {
             relation = new FDRelation().parse("->");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -180,9 +181,9 @@ public class FDRelationTest {
         try {
             relation = new FDRelation().parse("a->");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -191,7 +192,7 @@ public class FDRelationTest {
     @Test
     public void parseSyntaxFail3() {
         FDSimpleRelation relation = FDSimpleRelation.parse("->b");
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
 
@@ -204,9 +205,9 @@ public class FDRelationTest {
         try {
             relation = new FDRelation().parse("a->b->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
 
@@ -219,9 +220,9 @@ public class FDRelationTest {
         try {
             relation = new FDRelation().parse("a");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
-        assertEquals(null, relation);
+        assertNull(relation);
     }
 
     /**
@@ -233,7 +234,7 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation().parse("a->b");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> attributes = new HashSet<>();
         attributes.add("a");
@@ -260,7 +261,7 @@ public class FDRelationTest {
                     .parse("a->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
 
         HashSet<String> set = new HashSet<>();
@@ -280,7 +281,7 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation().parse("a->b");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> a = new HashSet<>();
         a.add("b");
@@ -298,7 +299,7 @@ public class FDRelationTest {
             fdr = new FDRelation().parse("a->b")
                     .parse("a->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> a = new HashSet<>();
         a.add("b");
@@ -317,7 +318,7 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation().parse("a->a");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> a = new HashSet<>();
         a.add("a");
@@ -334,7 +335,7 @@ public class FDRelationTest {
         try {
             fdr = new FDRelation().parse("a->b").parse("b->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         assertTrue(!fdr.getData().containsKey("a"));
         assertTrue(fdr.getData().containsKey("b"));
@@ -357,7 +358,7 @@ public class FDRelationTest {
             fdr = new FDRelation().parse("ab->bc","")
                     .parse("ab->e");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         fdr.compact();
         HashMap<HashSet<String>, HashSet<String>> map = new HashMap<>();
@@ -383,7 +384,7 @@ public class FDRelationTest {
                     .parse("b->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDKeySet set = new FDKeySet();
         assertEquals(set,fdr.transFinder("a"));
@@ -405,7 +406,7 @@ public class FDRelationTest {
                     .parse("b->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDRelation fdr2 = null;
         try {
@@ -414,7 +415,7 @@ public class FDRelationTest {
                     .parse("a->d")
                     .parse("b->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         fdr = fdr.transitiveClosure();
         assertEquals(fdr2,fdr);
@@ -431,7 +432,7 @@ public class FDRelationTest {
                     .parse("b->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         fdr = fdr.transitiveClosureReflexive();
         HashSet<String> a = new HashSet<>();
@@ -468,7 +469,7 @@ public class FDRelationTest {
             fdr = new FDRelation().parse("a->b")
                     .parse("b->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashSet<String> a = new HashSet<>();
         a.add("a");
@@ -490,7 +491,7 @@ public class FDRelationTest {
                     .parse("b->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDKeySet set = new FDKeySet();
         set.add(new FDKey("a"));
@@ -512,7 +513,7 @@ public class FDRelationTest {
                     .parse("a->c")
                     .parse("ab->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         HashMap<FDKey,HashSet<String>> map = new HashMap<>();
         HashSet<String> set = new HashSet<>();

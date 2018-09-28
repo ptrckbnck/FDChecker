@@ -1,9 +1,10 @@
-package de.unifrankfurt.dbis.fd;
+package de.unifrankfurt.dbis;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class FDSolverTest {
@@ -17,7 +18,7 @@ public class FDSolverTest {
         try {
             container = new FDRelation().parse("a->b").parse("bc->a");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDSolver solver = new FDSolver(container);
         FDKeySet set = new FDKeySet();
@@ -35,7 +36,7 @@ public class FDSolverTest {
         try {
             container = new FDRelation().parse("a->b").parse("bc->a");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDSolver solver = new FDSolver(container);
         assertEquals(3,solver.getNF());
@@ -50,7 +51,7 @@ public class FDSolverTest {
         try {
             container = new FDRelation().parse("ab->c").parse("b->c");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDSolver solver = new FDSolver(container);
         assertEquals(1,solver.getNF());
@@ -68,7 +69,7 @@ public class FDSolverTest {
                     .parse("a->d")
                     .parse("c->d");
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            assertTrue(false);
+            fail();
         }
         FDSolver solver = new FDSolver(container);
         assertEquals(2,solver.getNF());

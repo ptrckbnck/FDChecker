@@ -1,10 +1,12 @@
-package de.unifrankfurt.dbis.fd;
+package de.unifrankfurt.dbis;
 
-import org.junit.Test;
-
+import de.unifrankfurt.dbis.FDKey;
+import de.unifrankfurt.dbis.FDKeySet;
+import org.junit.jupiter.api.Test;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class FDKeySetTest {
 
@@ -41,10 +43,16 @@ public class FDKeySetTest {
     /**
      * checks of if NullPointerException is raised correctly if you try to add null
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void containsNull(){
         FDKeySet set = new FDKeySet();
-        set.contains(null);
+        try{
+            set.contains(null);
+            fail();
+        }catch(NullPointerException e){
+
+        }
+
     }
 
     /**
@@ -53,22 +61,29 @@ public class FDKeySetTest {
     @Test
     public void contains() {
         FDKeySet set = new FDKeySet();
-        assertTrue("empty Key",!set.contains(new FDKey()));
+        assertTrue(!set.contains(new FDKey()), "empty Key");
         FDKey key = new FDKey("a", "b");
-        assertTrue("pre add",!set.contains(key));
+        assertTrue(!set.contains(key), "pre add");
         set.add(key);
-        assertTrue("after add",set.contains(key));
+        assertTrue(set.contains(key), "after add");
         set.remove(key);
-        assertTrue("after remove",!set.contains(key));
+        assertTrue(!set.contains(key), "after remove");
     }
 
     /**
      * isRedundant should raise Exception if key is null
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void isRedundantNull(){
         FDKeySet set = new FDKeySet();
-        set.isRedundant(null);
+        try{
+            set.isRedundant(null);
+            fail();
+        }catch(NullPointerException e){
+
+        }
+
+
     }
 
 
@@ -160,10 +175,16 @@ public class FDKeySetTest {
     /**
      * add(null) should raise exception
      */
-    @Test(expected = NullPointerException.class)
+    @Test()
     public void add_null() {
         FDKeySet set = new FDKeySet();
-        set.add(null);
+        try{
+            set.add(null);
+            fail();
+        }catch(NullPointerException e){
+
+        }
+
     }
 
     /**
@@ -248,10 +269,16 @@ public class FDKeySetTest {
     /**
      * remove(null) should raise exception
      */
-    @Test(expected = NullPointerException.class)
+    @Test
     public void remove_null() {
         FDKeySet set = new FDKeySet();
-        set.remove(null);
+        try{
+            set.remove(null);
+            fail();
+        } catch(NullPointerException e) {
+
+        }
+
     }
 
     /**

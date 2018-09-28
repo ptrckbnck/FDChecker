@@ -1,4 +1,4 @@
-package de.unifrankfurt.dbis.fd;
+package de.unifrankfurt.dbis;
 
 import com.google.gson.Gson;
 import org.apache.commons.cli.*;

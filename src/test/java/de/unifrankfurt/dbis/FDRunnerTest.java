@@ -1,16 +1,14 @@
-package de.unifrankfurt.dbis.fd;
+package de.unifrankfurt.dbis;
 
 import com.google.gson.Gson;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import temp.RowFix;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FDRunnerTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -18,7 +16,7 @@ public class FDRunnerTest {
     /**
      * pipes stdout
      */
-    @Before
+    @BeforeEach
     public void setUpStreams() {
         sout = System.out;
         System.setOut(new PrintStream(outContent));
@@ -27,7 +25,7 @@ public class FDRunnerTest {
     /**
      * removes pipe
      */
-    @After
+    @AfterEach
     public void cleanUpStreams() {
         System.setOut(sout);
     }
@@ -44,7 +42,7 @@ public class FDRunnerTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if (is == null) assertTrue(false);
+        if (is == null) fail();
         System.setIn(is);
         String[] args = {"-p","-r"};
         FDRunner.main(args);
@@ -68,7 +66,7 @@ public class FDRunnerTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if (is == null) assertTrue(false);
+        assertNotNull(is);
         System.setIn(is);
         String[] args = {"-p","-r"};
         FDRunner.main(args);
@@ -107,7 +105,7 @@ public class FDRunnerTest {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if (is == null) assertTrue(false);
+        assertNotNull(is);
         System.setIn(is);
         String outPath = inUrl.getFile().replace("/testRelation.txt", "/testOutput.txt");
         String[] args = {"-r","-p","-o",outPath};
@@ -118,14 +116,14 @@ public class FDRunnerTest {
             String in;
             String out;
             while ((in = inBufReader.readLine()) != null | (out = outBufReader.readLine()) != null ){
-                assertTrue(in!=null);
-                assertTrue(in.equals(out));
+                assertNotNull(is);
+                assertEquals(in, out);
             }
             outBufReader.close();
             inBufReader.close();
         } catch (IOException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
