@@ -84,7 +84,7 @@ public class FDRunnerTest {
     public void mainInputFile() {
         String path = this.getClass().getResource("/testRelation.txt").getPath();
         String[] args = {"-r","-i",path};
-        assertEquals(0,FDRunner.main(args));
+        FDRunner.main(args);
         String ls = System.getProperty("line.separator");
         String expected = "A B C D E"+ls
                 +"A -> B"+ls
@@ -109,7 +109,7 @@ public class FDRunnerTest {
         System.setIn(is);
         String outPath = inUrl.getFile().replace("/testRelation.txt", "/testOutput.txt");
         String[] args = {"-r","-p","-o",outPath};
-        assertEquals(0,FDRunner.main(args));
+        FDRunner.main(args);
         try {
             BufferedReader outBufReader = new BufferedReader(new FileReader(outPath));
             BufferedReader inBufReader = new BufferedReader(new FileReader(inUrl.getFile()));
@@ -117,13 +117,13 @@ public class FDRunnerTest {
             String out;
             while ((in = inBufReader.readLine()) != null | (out = outBufReader.readLine()) != null ){
                 assertNotNull(is);
-                assertEquals(in, out);
+                assertTrue(in.equals(out));
             }
             outBufReader.close();
             inBufReader.close();
         } catch (IOException e) {
             e.printStackTrace();
-            fail();
+            assertTrue(false);
         }
     }
 
@@ -135,7 +135,7 @@ public class FDRunnerTest {
     public void mainJsonForcedAttributes() {
         String path = this.getClass().getResource("/testRelation.txt").getPath();
         String[] args = {"-j","-i",path};
-        assertEquals(0,FDRunner.main(args));
+        FDRunner.main(args);
         List<String> input= Arrays.asList("A -> B", "B -> C D", "E -> B");
         Set<String> attributes = new HashSet<>(Arrays.asList("A","B","C","D","E"));
         Set<String> forcedAttributes = new HashSet<>(Arrays.asList("A","B","C","D","E"));
@@ -189,7 +189,7 @@ public class FDRunnerTest {
     public void mainJsonNoForcedAttributes() {
         String path = this.getClass().getResource("/testRelationNoForcedAttributes.txt").getPath();
         String[] args = {"-j","-i",path};
-        assertEquals(0,FDRunner.main(args));
+        FDRunner.main(args);
         List<String> input= Arrays.asList("A -> B", "B -> C D", "E -> B");
         Set<String> attributes = new HashSet<>(Arrays.asList("A","B","C","D","E"));
         Set<String> forcedAttributes = null;

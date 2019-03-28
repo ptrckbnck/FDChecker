@@ -526,4 +526,31 @@ public class FDRelationTest {
         assertEquals(map,fdr.getDictKeyToAttribute());
     }
 
+    @Test
+    void compact1() {
+        try {
+            System.err.println(
+                    new FDRelation().parse("a->bd")
+                            .parse("b->ced")
+                            .parse("ed->a")
+                            .transitiveClosureReflexive()
+            );
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+    }
+
+    @Test
+    void reflexive() {
+        try {
+            System.err.println(
+                    new FDRelation().parse("a->bd")
+                            .parse("b->ced")
+                            .parse("ed->a")
+                            .reflexive()
+            );
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+    }
 }

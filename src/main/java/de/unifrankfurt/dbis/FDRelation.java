@@ -55,6 +55,12 @@ public class FDRelation {
         this.dataUpdate(key, values);
     }
 
+    private FDRelation(HashMap<String, FDKeySet> data, HashSet<String> attributes){
+        this.data = data;
+        this.attributes = attributes;
+        this.forcedAttributes = attributes;
+    }
+
     public HashSet<String> getForcedAttributes() {
         return forcedAttributes;
     }
@@ -161,6 +167,10 @@ public class FDRelation {
         this.attributes.addAll(values);
     }
 
+    public FDSolver solve() {
+        return FDSolver.createFDSolver(this);
+    }
+
     class UnexpectedAttributeException extends Exception {
 
         UnexpectedAttributeException(String s) {
@@ -224,6 +234,7 @@ public class FDRelation {
                     val = new HashSet<>();
                 }
                 val.add(entry.getKey());
+                val.addAll(set);
                 map.put(new HashSet<>(set), val);
             }
         }
@@ -288,7 +299,7 @@ public class FDRelation {
      * @return FDRelation
      */
     private FDRelation transitiveClosure(FDRelation fDR) {
-        FDRelation newFDR = new FDRelation(fDR.forcedAttributes);
+        FDRelation newFDR = new FDRelation(fDR.attributes);
         newFDR.attributes = new HashSet<>(fDR.attributes);
         HashMap<String, FDKeySet> newMap = new HashMap<>();
         for (String a : newFDR.attributes) {
@@ -306,17 +317,21 @@ public class FDRelation {
      * @return FDRelation
      */
     public FDRelation transitiveClosureReflexive() {
-        FDRelation newFDR = new FDRelation(this.forcedAttributes);
-        newFDR.attributes = new HashSet<>(this.attributes);
-        for (String a : this.attributes) {
-            FDKeySet set = new FDKeySet();
-            if (this.data.containsKey(a)) {
-                set.addAll(this.data.get(a));
-            }
-            set.add(new FDKey(a));
-            newFDR.data.put(a, set);
+        return this.transitiveClosure(this.reflexive());
+    }
+
+
+    public FDRelation reflexive(){
+        HashMap<String, FDKeySet> newData = new HashMap<>();
+        HashSet<String> attributes = new HashSet<>(this.attributes);
+        HashMap<String, FDKeySet> dat = this.data;
+        for(Map.Entry<String,FDKeySet> entry: dat.entrySet()){
+            String key = entry.getKey();
+            FDKeySet val = entry.getValue();
+            val.add(new FDKey(key));
+            newData.put(key,val);
         }
-        return this.transitiveClosure(newFDR); //transitive
+        return new FDRelation(newData,attributes);
     }
 
     /**

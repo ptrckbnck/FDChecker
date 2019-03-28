@@ -1,17 +1,15 @@
 package de.unifrankfurt.dbis;
 
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
+import java.util.stream.Collector;
 
 /**
  * FDSolver determines many normal Form related information for given relationContainer.
  *
  * @author Patrick Bonack
- * @version 1.0
- * @since 18.11.2017
+ * @version 1.1
+ * @since 28.3.2019
  */
 public class FDSolver {
 
@@ -40,13 +38,18 @@ public class FDSolver {
      */
     private FDKeySet keyCandidates;
 
-    FDSolver(FDRelation relationContainer) {
-        this.relation = relationContainer.transitiveClosureReflexive();
+    // relation should be transitive and reflexive
+    private FDSolver(FDRelation relationContainer) {
+        this.relation = relationContainer;
         this.NF = 1;
-        this.keyCandidates = this.keyCandidates();
+        this.keyCandidates = keyCandidates(relationContainer);
         this.prim = this.prim();
         this.notPrim = this.notPrim();
         this.NF = this.NF();
+    }
+
+    public static FDSolver createFDSolver(FDRelation relationContainer) {
+        return new FDSolver(relationContainer.transitiveClosureReflexive());
     }
 
 
@@ -130,16 +133,29 @@ public class FDSolver {
      * @return true if in third normal form
      */
     private boolean is3NF() {
-        for (HashMap.Entry<String, FDKeySet> entry : relation.getData().entrySet()) {
-            FDKeySet keySet = entry.getValue();
-            String s = entry.getKey();
-            if (this.prim.contains(s)) continue;
-            //looks if any key which the attribute is dependent on is not candidate key.
-            //that is okay because FDKeySet cannot have supersets of candidate keys.
-            if (!this.keyCandidates.containsAll(keySet)) {
-                return false;
+        FDRelation rel = this.relation;
+        for (String outerAtt :this.getAttributes()){
+            for (String innerAtt :this.getAttributes()){
+                if(outerAtt.equals(innerAtt)){
+                    continue;
+                }
+                if(!rel.getDependenciesOf(outerAtt).contains(innerAtt)){
+                    continue;
+                }
+                if(rel.getDependenciesOf(innerAtt).contains(outerAtt)){
+                    continue;
+                }
+                final HashSet<String> innerDependencies = new HashSet<>(rel.getDependenciesOf(innerAtt));
+                innerDependencies.remove(outerAtt);
+                innerDependencies.remove(innerAtt);
+                if(!innerDependencies.isEmpty()){
+                    return false;
+                }
+
             }
         }
+
+
         return true;
     }
 
@@ -171,26 +187,21 @@ public class FDSolver {
      * creates the product of every FDKeySet an attribute depends on
      *
      * @return FDKeySet of every candidate key
+     * @param relationContainer
      */
-    private FDKeySet keyCandidates() {
-        FDKeySet keyCandidates = new FDKeySet();
-        for (HashMap.Entry<String, FDKeySet> entry : relation.getData().entrySet()) {
-            FDKeySet keySet = entry.getValue();
-            FDKeySet mergeSet = new FDKeySet();
-            if (keyCandidates.isEmpty()) {
-                mergeSet.addAll(keySet);
-            } else {
-                for (FDKey key : keyCandidates) {
-                    for (FDKey lookUpKey : keySet) {
-                        Collection<String> col = new HashSet<>(key);
-                        col.addAll(lookUpKey);
-                        mergeSet.add(new FDKey(col));
-                    }
-                }
-            }
-            keyCandidates = mergeSet;
-        }
-        return keyCandidates;
+    private static FDKeySet keyCandidates(FDRelation relationContainer) {
+        HashSet<String> atts = relationContainer.getAttributes();
+        return relationContainer.compact()
+                .entrySet()
+                .stream()
+                .filter(x->x.getValue().equals(atts))
+                .map(Map.Entry::getKey)
+                .collect(Collector.of(FDKeySet::new,
+                        (a,b)-> a.add(new FDKey(b)),
+                        (a,b)->{
+                    a.addAll(b);
+                    return a;
+                }));
     }
 
 }

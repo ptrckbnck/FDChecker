@@ -121,19 +121,19 @@ public class FDRunner {
     }
 
 
-    public static int main(String[] args) {
+    public static void main(String[] args) {
         FDRunner fdr = new FDRunner();
         Options options = fdr.createOptions();
         CommandLine cl = fdr.argumentParse(options, args);
         if (cl == null) {
             System.err.println("Argument parsing failed");
-            return 4;
+            return;
         }
 
         //print help
         if (cl.hasOption("h") | (cl.hasOption("i") & cl.hasOption("p"))) {
             fdr.printHelp(options);
-            return 0;
+            return;
         }
 
         //choose output
@@ -149,7 +149,7 @@ public class FDRunner {
         }
         if (om == null) {
             System.err.println("Creating output file failed");
-            return 3;
+            return;
         }
 
         //choose input
@@ -168,7 +168,7 @@ public class FDRunner {
 
         if (bufReader == null) {
             System.err.println("input file not found");
-            return 2;
+            return;
         }
 
 
@@ -199,7 +199,7 @@ public class FDRunner {
                 if (cl.hasOption("r") | !cl.hasOption("j")) om.println(x);
             }
             //remainder
-            Boolean exit = false;
+            boolean exit = false;
             while ((!exit) && ((x = bufReader.readLine()) != null)) {
                 if (x.isEmpty()) exit = true;
                 else {
@@ -210,7 +210,7 @@ public class FDRunner {
             om.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return 10;
+            return;
         } finally {
             if (outFile == null) {
                 try {
@@ -221,7 +221,7 @@ public class FDRunner {
             }
         }
         //only read
-        if (cl.hasOption("r")) return 0;
+        if (cl.hasOption("r")) return;
 
         //create FDRelation
         FDRelation fdRelation = new FDRelation(attributeList);
@@ -230,25 +230,25 @@ public class FDRunner {
             FDSimpleRelation simple = FDSimpleRelation.parse(str, delimiter);
             if (simple == null) {
                 System.err.println("Failed parsing: " + str);
-                return 0;
+                return;
             }
             try {
                 fdRelation.add(simple);
             } catch (FDKey.EmptyException e) {
                 System.err.println("Empty keys are not allowed in " + str);
-                return 0;
+                return;
             } catch (FDRelation.UnexpectedAttributeException e) {
                 System.err.println("Unexpected attributes " + e.getMessage() + " in " + str);
-                return 0;
+                return;
             }
         }
 
 
-        FDSolver solver = new FDSolver(fdRelation);
+        FDSolver solver = FDSolver.createFDSolver(fdRelation);
         if (cl.hasOption("j")) {
             om.println(new Report(input, solver).toJson());
         } else om.println(solver.report());
-        return 0;
+        return;
     }
 
     /**

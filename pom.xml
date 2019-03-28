@@ -24,7 +24,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>de.unifrankfurt.dbis.fd.Runner</mainClass>
+              <mainClass>de.unifrankfurt.dbis.FDRunner</mainClass>
             </manifest>
           </archive>
         </configuration>

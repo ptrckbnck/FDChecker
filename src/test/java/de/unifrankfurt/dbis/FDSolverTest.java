@@ -3,7 +3,6 @@ package de.unifrankfurt.dbis;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -20,7 +19,7 @@ public class FDSolverTest {
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
-        FDSolver solver = new FDSolver(container);
+        FDSolver solver = FDSolver.createFDSolver(container);
         FDKeySet set = new FDKeySet();
         set.add(new FDKey("a","c"));
         set.add(new FDKey("b","c"));
@@ -38,7 +37,7 @@ public class FDSolverTest {
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
-        FDSolver solver = new FDSolver(container);
+        FDSolver solver = FDSolver.createFDSolver(container);
         assertEquals(3,solver.getNF());
     }
 
@@ -53,7 +52,7 @@ public class FDSolverTest {
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
-        FDSolver solver = new FDSolver(container);
+        FDSolver solver = FDSolver.createFDSolver(container);
         assertEquals(1,solver.getNF());
     }
 
@@ -71,7 +70,79 @@ public class FDSolverTest {
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
-        FDSolver solver = new FDSolver(container);
+        FDSolver solver = FDSolver.createFDSolver(container);
         assertEquals(2,solver.getNF());
+    }
+
+
+    @Test
+    public void Test() {
+        FDRelation container = null;
+        try {
+            container = new FDRelation().parse("ac->bd")
+                    .parse("be->cd")
+                    .parse("bc->e");
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+        FDSolver solver = FDSolver.createFDSolver(container);
+        System.out.println(solver.report());
+    }
+
+    @Test
+    public void Test2() {
+        FDRelation container = null;
+        try {
+            container = new FDRelation().parse("a->bc")
+                    .parse("be->ad")
+                    .parse("bc->ae");
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+        FDSolver solver = FDSolver.createFDSolver(container);
+        System.out.println(solver.report());
+    }
+
+    @Test
+    public void Test3() {
+        try {
+            System.err.println(
+                    new FDRelation().parse("a->bd")
+                    .parse("b->ced")
+                    .parse("ed->a")
+                    .solve()
+                    .report()
+            );
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void Test5() {
+        try {
+            System.err.println(
+                    new FDRelation().parse("a->bc")
+                            .parse("b->c")
+                            .parse("ab->c")
+                            .solve().report()
+            );
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void Test4() {
+        FDRelation container = null;
+        try {
+            container = new FDRelation().parse("ab->cd")
+                    .parse("e->cd")
+                    .parse("c->d");
+        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
+            fail();
+        }
+        FDSolver solver = FDSolver.createFDSolver(container);
+        System.out.println(solver.report());
     }
 }
