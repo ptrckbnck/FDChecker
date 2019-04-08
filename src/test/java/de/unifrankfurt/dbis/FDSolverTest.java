@@ -1,5 +1,6 @@
 package de.unifrankfurt.dbis;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +77,7 @@ public class FDSolverTest {
 
 
     @Test
-    public void Test() {
+    public void nfTest() {
         FDRelation container = null;
         try {
             container = new FDRelation().parse("ac->bd")
@@ -86,11 +87,11 @@ public class FDSolverTest {
             fail();
         }
         FDSolver solver = FDSolver.createFDSolver(container);
-        System.out.println(solver.report());
+        assertEquals(1,solver.getNF());
     }
 
     @Test
-    public void Test2() {
+    public void nfTest2() {
         FDRelation container = null;
         try {
             container = new FDRelation().parse("a->bc")
@@ -100,40 +101,34 @@ public class FDSolverTest {
             fail();
         }
         FDSolver solver = FDSolver.createFDSolver(container);
-        System.out.println(solver.report());
+        assertEquals(3,solver.getNF());
     }
 
     @Test
-    public void Test3() {
+    public void nfTest3() {
+        FDSolver solved = null;
         try {
-            System.err.println(
-                    new FDRelation().parse("a->bd")
+            solved = new FDRelation().parse("a->bd")
                     .parse("b->ced")
                     .parse("ed->a")
-                    .solve()
-                    .report()
-            );
+                    .solve();
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
+        assertEquals(3, solved.getNF());
     }
 
     @Test
-    public void Test5() {
-        try {
-            System.err.println(
-                    new FDRelation().parse("a->bc")
+    public void nfTest4() throws FDKey.EmptyException, FDRelation.UnexpectedAttributeException {
+        FDSolver solved = new FDRelation().parse("a->bc")
                             .parse("b->c")
                             .parse("ab->c")
-                            .solve().report()
-            );
-        } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
-            fail();
-        }
+                            .solve();
+        assertEquals(2,solved.getNF());
     }
 
     @Test
-    public void Test4() {
+    public void nfTest5() {
         FDRelation container = null;
         try {
             container = new FDRelation().parse("ab->cd")
@@ -143,6 +138,17 @@ public class FDSolverTest {
             fail();
         }
         FDSolver solver = FDSolver.createFDSolver(container);
-        System.out.println(solver.report());
+        assertEquals(1,solver.getNF());
+    }
+
+
+    @Test
+    public void nfTest6() throws FDKey.EmptyException, FDRelation.UnexpectedAttributeException {
+
+        FDSolver solved = new FDRelation().parse("a->b")
+                .parse("be->ad")
+                .parse("bc->ad").solve();
+        assertEquals(1,solved.getNF());
+
     }
 }

@@ -4,7 +4,6 @@ package de.unifrankfurt.dbis;
 import java.util.*;
 
 /**
- * A special Set<FDKey>.
  * It is guaranteed, that if this contains FDKey key,
  * this does not also contain any superset of key.
  * If key is added to this, any superset of key will be removed.
@@ -15,7 +14,7 @@ import java.util.*;
  * @version 1.0
  * @since 18.11.2017
  */
-public class FDKeySet implements Set<FDKey> {
+public class FDKeySet implements Collection<FDKey>{
 
     /**
      * size the cardinality of this
@@ -53,7 +52,6 @@ public class FDKeySet implements Set<FDKey> {
      * @return True if this contains o
      * @throws NullPointerException if o == null
      */
-    @Override
     public boolean contains(Object o) {
         if (o == null) throw new NullPointerException();
         FDKey key = (FDKey) o;
@@ -86,7 +84,7 @@ public class FDKeySet implements Set<FDKey> {
         for (int i = 0; i < s && i < this.maxInitSet(); i = i + 1) {
             lookupSet = this.data.get(i);
             for (FDKey lookupKey : lookupSet) {
-                if (key.containsAll(lookupKey)) return true;
+                if (key.isSuperKeyOf(lookupKey)) return true;
             }
         }
         return false;
@@ -117,10 +115,10 @@ public class FDKeySet implements Set<FDKey> {
 
         private FDKeySetIterator() {
             List<FDKey> list = new ArrayList<>();
-            for (HashSet<FDKey> set : data){
+            for (HashSet<FDKey> set : data) {
                 list.addAll(new ArrayList<>(set));
             }
-            iter=list.iterator();
+            iter = list.iterator();
         }
 
 
@@ -182,7 +180,7 @@ public class FDKeySet implements Set<FDKey> {
         // find and remove obsolete elements.
         HashSet<FDKey> toRemove = new HashSet<>();
         for (FDKey lookUpKey : this) {
-            if (lookUpKey.containsAll(key)) {
+            if (lookUpKey.isSuperKeyOf(key)) {
                 toRemove.add(lookUpKey);
             }
         }
@@ -195,6 +193,7 @@ public class FDKeySet implements Set<FDKey> {
         this.addUnsafe(key);
         return true;
     }
+
 
     /**
      * Removes o from this
@@ -323,6 +322,7 @@ public class FDKeySet implements Set<FDKey> {
      * @param <T>
      * @return
      */
+    @Override
     public <T> T[] toArray(T[] a) {
         return a;
     }

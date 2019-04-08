@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class FDSimpleRelationTest {
@@ -19,7 +20,7 @@ public class FDSimpleRelationTest {
         HashSet<String> values = new HashSet<>();
         values.add("b");
         HashSet<String> attributes  = new HashSet<>();
-        attributes.addAll(key);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         assertEquals(attributes,rel.getAttributes());
         assertEquals(key,rel.getKey());
@@ -36,7 +37,7 @@ public class FDSimpleRelationTest {
         FDKey key = new FDKey();
         HashSet<String> values = new HashSet<>();
         HashSet<String> attributes  = new HashSet<>();
-        attributes.addAll(key);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         assertEquals(attributes,rel.getAttributes());
         assertEquals(key,rel.getKey());
@@ -54,7 +55,7 @@ public class FDSimpleRelationTest {
         values.add("a");
         values.add("b");
         HashSet<String> attributes  = new HashSet<>();
-        attributes.addAll(key);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         assertEquals(attributes,rel.getAttributes());
         assertEquals(key,rel.getKey());
@@ -70,8 +71,8 @@ public class FDSimpleRelationTest {
         HashSet<String> values = new HashSet<>();
         values.add("b");
         HashSet<String> attributes  = new HashSet<>();
-        FDSimpleRelation rel = new FDSimpleRelation(key,values);
-        attributes.addAll(key);
+        FDSimpleRelation rel = new FDSimpleRelation(key.toSet(),values);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         assertEquals(attributes,rel.getAttributes());
         assertEquals(key,rel.getKey());
@@ -88,7 +89,7 @@ public class FDSimpleRelationTest {
         values.add("c");
         HashSet<String> attributes  = new HashSet<>();
         FDSimpleRelation rel = FDSimpleRelation.parse("ab->c");
-        attributes.addAll(key);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         assertEquals(attributes,rel.getAttributes());
         assertEquals(key,rel.getKey());
@@ -101,7 +102,7 @@ public class FDSimpleRelationTest {
     @Test
     public void parseSyntaxFail1() {
         FDSimpleRelation relation = FDSimpleRelation.parse("->");
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -110,7 +111,7 @@ public class FDSimpleRelationTest {
     @Test
     public void parseSyntaxFail2() {
         FDSimpleRelation relation = FDSimpleRelation.parse("a->");
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -119,7 +120,7 @@ public class FDSimpleRelationTest {
     @Test
     public void parseSyntaxFail3() {
         FDSimpleRelation relation = FDSimpleRelation.parse("->b");
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -128,7 +129,7 @@ public class FDSimpleRelationTest {
     @Test
     public void parseSyntaxFail4() {
         FDSimpleRelation relation = FDSimpleRelation.parse("a->b->c");
-        assertEquals(null,relation);
+        assertNull(relation);
     }
 
     /**
@@ -137,7 +138,7 @@ public class FDSimpleRelationTest {
     @Test
     public void parseSyntaxFail5() {
         FDSimpleRelation relation = FDSimpleRelation.parse("a");
-        assertEquals(null, relation);
+        assertNull(relation);
     }
 
 }

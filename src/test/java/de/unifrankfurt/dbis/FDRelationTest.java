@@ -34,7 +34,7 @@ public class FDRelationTest {
         values.add("d");
         FDRelation fdr = null;
         try {
-            fdr = new FDRelation(key,values);
+            fdr = new FDRelation(new FDKey(key),values);
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
@@ -58,7 +58,7 @@ public class FDRelationTest {
         values.add("d");
         FDRelation fdr = null;
         try {
-            fdr = new FDRelation(key,values);
+            fdr = new FDRelation(new FDKey(key),values);
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
@@ -86,7 +86,7 @@ public class FDRelationTest {
         HashSet<String> values = new HashSet<>();
         values.add("b");
         HashSet<String> attributes  = new HashSet<>();
-        attributes.addAll(key);
+        attributes.addAll(key.toSet());
         attributes.addAll(values);
         FDKeySet set = new FDKeySet();
         set.add(key);
@@ -360,7 +360,6 @@ public class FDRelationTest {
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
-        fdr.compact();
         HashMap<HashSet<String>, HashSet<String>> map = new HashMap<>();
         HashSet<String> key = new HashSet<>();
         key.add("a");
@@ -529,12 +528,10 @@ public class FDRelationTest {
     @Test
     void compact1() {
         try {
-            System.err.println(
-                    new FDRelation().parse("a->bd")
-                            .parse("b->ced")
-                            .parse("ed->a")
-                            .transitiveClosureReflexive()
-            );
+            FDRelation rel = new FDRelation().parse("a->bd")
+                    .parse("b->ced")
+                    .parse("ed->a")
+                    .transitiveClosureReflexive();
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }
@@ -543,12 +540,10 @@ public class FDRelationTest {
     @Test
     void reflexive() {
         try {
-            System.err.println(
-                    new FDRelation().parse("a->bd")
+            FDRelation rel = new FDRelation().parse("a->bd")
                             .parse("b->ced")
                             .parse("ed->a")
-                            .reflexive()
-            );
+                            .reflexive();
         } catch (FDKey.EmptyException | FDRelation.UnexpectedAttributeException e) {
             fail();
         }

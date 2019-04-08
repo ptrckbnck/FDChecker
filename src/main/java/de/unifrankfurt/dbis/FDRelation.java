@@ -50,7 +50,7 @@ public class FDRelation {
     }
 
 
-    FDRelation(Collection<String> key, Collection<String> values) throws FDKey.EmptyException, UnexpectedAttributeException {
+    FDRelation(FDKey key, Collection<String> values) throws FDKey.EmptyException, UnexpectedAttributeException {
         this();
         this.dataUpdate(key, values);
     }
@@ -138,7 +138,7 @@ public class FDRelation {
      *
      * @param key FDKey
      */
-    private void dataUpdate(Collection<String> key, Collection<String> values) throws FDKey.EmptyException, UnexpectedAttributeException {
+    private void dataUpdate(FDKey key, Collection<String> values) throws FDKey.EmptyException, UnexpectedAttributeException {
         for (String s : values) {
             FDKeySet keySet;
             if (this.data.containsKey(s)) {
@@ -147,14 +147,14 @@ public class FDRelation {
                 keySet = new FDKeySet();
             }
             if (key.isEmpty()) throw new FDKey.EmptyException();
-            keySet.add(new FDKey(key));
+            keySet.add(key);
             this.data.put(s, keySet);
         }
 
         // test for unexpected attribute
 
         if (this.forcedAttributes != null) {
-            HashSet<String> col = new HashSet<>(key);
+            Set<String> col = key.toSet();
             col.addAll(values);
             if (!this.forcedAttributes.containsAll(col)) {
                 HashSet<String> conflict = new HashSet<>(col);
@@ -163,7 +163,7 @@ public class FDRelation {
             }
         }
         // add new attributes
-        this.attributes.addAll(key);
+        this.attributes.addAll(key.toSet());
         this.attributes.addAll(values);
     }
 
@@ -226,7 +226,8 @@ public class FDRelation {
     protected HashMap<Set<String>, Set<String>> compact() {
         HashMap<Set<String>, Set<String>> map = new HashMap<>();
         for (Map.Entry<String, FDKeySet> entry : this.data.entrySet()) {
-            for (Set<String> set : entry.getValue()) {
+            for (FDKey fdkey : entry.getValue()) {
+                Set<String> set = fdkey.toSet();
                 Set<String> val;
                 if (map.containsKey(set)) {
                     val = map.get(set);
@@ -234,8 +235,7 @@ public class FDRelation {
                     val = new HashSet<>();
                 }
                 val.add(entry.getKey());
-                val.addAll(set);
-                map.put(new HashSet<>(set), val);
+                map.put(set, val);
             }
         }
         return map;
@@ -257,7 +257,7 @@ public class FDRelation {
         for (String attribute : this.data.keySet()) {
             FDKeySet keySet = this.data.get(attribute);
             for (FDKey lookUpKey : keySet) {
-                if (key.containsAll(lookUpKey)) set.add(attribute);
+                if (key.isSuperKeyOf(lookUpKey)) set.add(attribute);
             }
         }
         return set;
@@ -305,7 +305,7 @@ public class FDRelation {
         for (String a : newFDR.attributes) {
             FDKeySet f = fDR.transFinder(a);
             if (f.isEmpty()) continue;
-            newMap.put(a, fDR.transFinder(a));
+            newMap.put(a, f);
         }
         newFDR.data = newMap;
         return newFDR;
@@ -324,12 +324,13 @@ public class FDRelation {
     public FDRelation reflexive(){
         HashMap<String, FDKeySet> newData = new HashMap<>();
         HashSet<String> attributes = new HashSet<>(this.attributes);
-        HashMap<String, FDKeySet> dat = this.data;
-        for(Map.Entry<String,FDKeySet> entry: dat.entrySet()){
-            String key = entry.getKey();
-            FDKeySet val = entry.getValue();
-            val.add(new FDKey(key));
-            newData.put(key,val);
+        for (String attribute : getAttributes()){
+            FDKeySet val = new FDKeySet();
+            val.add(new FDKey(attribute));
+            if(this.data.containsKey(attribute)){
+                val.addAll(this.data.get(attribute));
+            }
+            newData.put(attribute,val);
         }
         return new FDRelation(newData,attributes);
     }
@@ -359,13 +360,13 @@ public class FDRelation {
         FDKeySet alternatives = new FDKeySet();
         alternatives.addAll(keySet);
         boolean foundSomething = false;
-        for (Collection<String> attSet : keySet) {
-            for (String att : attSet) {
+        for (FDKey fdkey : keySet) {
+            for (String att : fdkey) {
                 if (this.data.containsKey(att)) {
-                    for (Collection<String> possibles : this.data.get(att)) {
-                        Collection<String> altSet = new HashSet<>(attSet);
+                    for (FDKey possibles : this.data.get(att)) {
+                        Collection<String> altSet = new HashSet<>(fdkey.toSet());
                         altSet.remove(att);
-                        altSet.addAll(possibles);
+                        altSet.addAll(possibles.toSet());
                         boolean added = alternatives.add(new FDKey(altSet));
                         foundSomething = foundSomething || added;
                     }

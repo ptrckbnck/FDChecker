@@ -99,7 +99,7 @@ public class FDSimpleRelation {
      */
     public HashSet<String> getAttributes() {
         HashSet<String> set = new HashSet<>();
-        set.addAll(this.key);
+        set.addAll(this.key.toSet());
         set.addAll(this.values);
         return set;
     }

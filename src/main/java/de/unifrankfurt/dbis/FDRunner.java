@@ -1,6 +1,7 @@
 package de.unifrankfurt.dbis;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -246,76 +247,14 @@ public class FDRunner {
 
         FDSolver solver = FDSolver.createFDSolver(fdRelation);
         if (cl.hasOption("j")) {
-            om.println(new Report(input, solver).toJson());
+            om.println(new Gson().toJson(solver));
         } else om.println(solver.report());
-        return;
     }
 
     /**
      * class which combines all useful information about relation
      */
-    static class Report {
-        private final List<String> input;
-        private final Set<String> attributes;
-        private final Set<String> forcedAttributes;
-        private final Map<String, FDKeySet> relation;
-        private final Set<String> prim;
-        private final Set<String> notPrim;
-        private final FDKeySet keyCandidates;
-        private final int normalForm;
 
-
-        Report(List<String> input, FDSolver solver) {
-            this.input = input;
-            this.attributes = solver.getRelation().getAttributes();
-            this.relation = solver.getRelation().getData();
-            this.forcedAttributes = solver.getRelation().getForcedAttributes();
-            this.keyCandidates = solver.getKeyCandidates();
-            this.prim = solver.getPrim();
-            this.notPrim = solver.getNotPrim();
-            this.normalForm = solver.getNF();
-        }
-
-        Report(List<String> input, Set<String> attributes, Set<String> forcedAttributes, Map<String, FDKeySet> relation, Set<String> prim, Set<String> notPrim, FDKeySet keyCandidates, int normalForm) {
-            this.input = input;
-            this.attributes = attributes;
-            this.forcedAttributes = forcedAttributes;
-            this.relation = relation;
-            this.prim = prim;
-            this.notPrim = notPrim;
-            this.keyCandidates = keyCandidates;
-            this.normalForm = normalForm;
-        }
-
-        String toJson() {
-            return new Gson().toJson(this);
-        }
-
-        public String toString() {
-            return this.toJson();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Report report = (Report) o;
-            return normalForm == report.normalForm &&
-                    Objects.equals(input, report.input) &&
-                    Objects.equals(attributes, report.attributes) &&
-                    Objects.equals(forcedAttributes, report.forcedAttributes) &&
-                    Objects.equals(relation, report.relation) &&
-                    Objects.equals(prim, report.prim) &&
-                    Objects.equals(notPrim, report.notPrim) &&
-                    Objects.equals(keyCandidates, report.keyCandidates);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(input, attributes, forcedAttributes, relation, prim, notPrim, keyCandidates, normalForm);
-        }
-    }
 
     /**
      * prints help msg

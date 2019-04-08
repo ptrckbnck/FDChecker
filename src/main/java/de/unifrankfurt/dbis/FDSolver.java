@@ -1,8 +1,10 @@
 package de.unifrankfurt.dbis;
 
 
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * FDSolver determines many normal Form related information for given relationContainer.
@@ -16,40 +18,46 @@ public class FDSolver {
     /**
      * base relation
      */
-    private FDRelation relation;
+    private final FDRelation relation;
 
+
+    private final FDRelation relationRaw;
     /**
      * any prim attribute
      */
-    private HashSet<String> prim;
+    private final HashSet<String> prim;
 
     /**
      * any non-prim attribute
      */
-    private HashSet<String> notPrim;
+    private final HashSet<String> notPrim;
 
     /**
      * the maximum normal form the relation is in.
      */
-    private int NF;
+    private final int NF;
 
     /**
      * any candidate key
      */
-    private FDKeySet keyCandidates;
+    private final FDKeySet keyCandidates;
 
-    // relation should be transitive and reflexive
-    private FDSolver(FDRelation relationContainer) {
-        this.relation = relationContainer;
-        this.NF = 1;
-        this.keyCandidates = keyCandidates(relationContainer);
-        this.prim = this.prim();
-        this.notPrim = this.notPrim();
-        this.NF = this.NF();
+    protected FDSolver(FDRelation relation, FDRelation relationRaw, HashSet<String> prim, HashSet<String> notPrim, int NF, FDKeySet keyCandidates) {
+        this.relation = relation;
+        this.relationRaw = relationRaw;
+        this.prim = prim;
+        this.notPrim = notPrim;
+        this.NF = NF;
+        this.keyCandidates = keyCandidates;
     }
 
-    public static FDSolver createFDSolver(FDRelation relationContainer) {
-        return new FDSolver(relationContainer.transitiveClosureReflexive());
+    public static FDSolver createFDSolver(FDRelation relation) {
+        FDRelation transitiveClosureReflexive = relation.transitiveClosureReflexive();
+        FDKeySet keyCandidates = keyCandidates(transitiveClosureReflexive);
+        HashSet<String> prim = prim(keyCandidates);
+        HashSet<String> notPrim = notPrim(prim, transitiveClosureReflexive.getAttributes());
+        int nf  = NF(notPrim, keyCandidates, transitiveClosureReflexive);
+        return new FDSolver(transitiveClosureReflexive, relation, prim, notPrim, nf, keyCandidates);
     }
 
 
@@ -80,10 +88,10 @@ public class FDSolver {
     /**
      * @return HashSet of any prim attribute
      */
-    private HashSet<String> prim() {
+    private static HashSet<String> prim(FDKeySet keyCandidates) {
         HashSet<String> _prim = new HashSet<>();
-        for (FDKey key : this.keyCandidates) {
-            _prim.addAll(key);
+        for (FDKey key : keyCandidates) {
+            key.forEach(_prim::add);
         }
         return _prim;
     }
@@ -91,19 +99,19 @@ public class FDSolver {
     /**
      * @return HashSet of any non-prim attribute
      */
-    private HashSet<String> notPrim() {
-        HashSet<String> _notPrim = new HashSet<>(this.getAttributes());
-        _notPrim.removeAll(this.prim);
+    private static HashSet<String> notPrim(HashSet<String> prim, HashSet<String> attributes) {
+        HashSet<String> _notPrim = new HashSet<>(attributes);
+        _notPrim.removeAll(prim);
         return _notPrim;
     }
 
     /**
      * @return max normal Form (no more than 3)
      */
-    private int NF() {
+    private static int NF(HashSet<String> notPrim, FDKeySet keyCandidates, FDRelation relation) {
         int nf = 1;
-        if (this.is2NF()) nf = 2;
-        if (nf == 2 && this.is3NF()) nf = 3;
+        if (is2NF(notPrim, keyCandidates, relation)) nf = 2;
+        if (nf == 2 && is3NF(relation)) nf = 3;
         return nf;
     }
 
@@ -112,11 +120,12 @@ public class FDSolver {
      *
      * @return true if in second normal Form
      */
-    private boolean is2NF() {
-        for (String att : this.notPrim) {
-            for (FDKey key : this.keyCandidates) {
+    private static boolean is2NF(HashSet<String> notPrim, FDKeySet keyCandidates, FDRelation relation) {
+        HashMap<String, FDKeySet> data = relation.getData();
+        for (String att : notPrim) {
+            for (FDKey key : keyCandidates) {
                 for (FDKey subKey : key.powerSetWoSelfAndEmptySet()) {
-                    FDKeySet keySet = this.relation.getData().get(att);
+                    FDKeySet keySet = data.get(att);
                     if (keySet.contains(subKey)) {
                         return false;
                     }
@@ -132,30 +141,27 @@ public class FDSolver {
      *
      * @return true if in third normal form
      */
-    private boolean is3NF() {
-        FDRelation rel = this.relation;
-        for (String outerAtt :this.getAttributes()){
-            for (String innerAtt :this.getAttributes()){
+    private static boolean is3NF(FDRelation relation) {
+        HashSet<String> attributes = relation.getAttributes();
+        for (String outerAtt : attributes){
+            for (String innerAtt : attributes){
                 if(outerAtt.equals(innerAtt)){
                     continue;
                 }
-                if(!rel.getDependenciesOf(outerAtt).contains(innerAtt)){
+                if(!relation.getDependenciesOf(outerAtt).contains(innerAtt)){
                     continue;
                 }
-                if(rel.getDependenciesOf(innerAtt).contains(outerAtt)){
+                if(relation.getDependenciesOf(innerAtt).contains(outerAtt)){
                     continue;
                 }
-                final HashSet<String> innerDependencies = new HashSet<>(rel.getDependenciesOf(innerAtt));
+                final HashSet<String> innerDependencies = new HashSet<>(relation.getDependenciesOf(innerAtt));
                 innerDependencies.remove(outerAtt);
                 innerDependencies.remove(innerAtt);
                 if(!innerDependencies.isEmpty()){
                     return false;
                 }
-
             }
         }
-
-
         return true;
     }
 
@@ -187,21 +193,34 @@ public class FDSolver {
      * creates the product of every FDKeySet an attribute depends on
      *
      * @return FDKeySet of every candidate key
-     * @param relationContainer
+     * @param relation
      */
-    private static FDKeySet keyCandidates(FDRelation relationContainer) {
-        HashSet<String> atts = relationContainer.getAttributes();
-        return relationContainer.compact()
-                .entrySet()
-                .stream()
-                .filter(x->x.getValue().equals(atts))
-                .map(Map.Entry::getKey)
-                .collect(Collector.of(FDKeySet::new,
-                        (a,b)-> a.add(new FDKey(b)),
-                        (a,b)->{
-                    a.addAll(b);
-                    return a;
-                }));
+    public static FDKeySet keyCandidates(FDRelation relation) {
+        FDKeySet product = null;
+        for(FDKeySet keySet : relation.getData().values()){
+            product = product(product, keySet);
+        }
+        return product;
+
     }
 
+    public static FDKeySet product(FDKeySet keySet1, FDKeySet keySet2) {
+        if (Objects.isNull(keySet1)) return keySet2;
+        if (Objects.isNull(keySet2)) return keySet1;
+        FDKeySet result = new FDKeySet();
+        for (FDKey key1 : keySet1){
+            for (FDKey key2 : keySet2){
+                HashSet<String> set = new HashSet<>();
+                key1.forEach(set::add);
+                key2.forEach(set::add);
+                result.add(new FDKey(set));
+            }
+        }
+        return result;
+    }
+
+
+    public FDRelation getRelationRaw() {
+        return relationRaw;
+    }
 }
