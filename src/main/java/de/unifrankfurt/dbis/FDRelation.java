@@ -299,16 +299,14 @@ public class FDRelation {
      * @return FDRelation
      */
     private FDRelation transitiveClosure(FDRelation fDR) {
-        FDRelation newFDR = new FDRelation(fDR.attributes);
-        newFDR.attributes = new HashSet<>(fDR.attributes);
-        HashMap<String, FDKeySet> newMap = new HashMap<>();
-        for (String a : newFDR.attributes) {
+
+        HashMap<String, FDKeySet> newData = new HashMap<>();
+        for (String a : fDR.getAttributes()) {
             FDKeySet f = fDR.transFinder(a);
             if (f.isEmpty()) continue;
-            newMap.put(a, f);
+            newData.put(a, f);
         }
-        newFDR.data = newMap;
-        return newFDR;
+        return new FDRelation(newData,fDR.getAttributes());
     }
 
     /**

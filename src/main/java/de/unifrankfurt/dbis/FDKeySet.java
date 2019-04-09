@@ -20,7 +20,7 @@ public class FDKeySet implements Collection<FDKey>{
      * size the cardinality of this
      * data ArrayList with HashSets of FDKeys. The set at index i contains only FDKey with size i.
      */
-    protected ArrayList<HashSet<FDKey>> data;
+    protected final ArrayList<HashSet<FDKey>> data;
 
     /**
      * count of all contained FDKey
@@ -246,7 +246,7 @@ public class FDKeySet implements Collection<FDKey>{
      */
     @Override
     public void clear() {
-        this.data = new ArrayList<>();
+        this.data.clear();
         this.size = 0;
     }
 

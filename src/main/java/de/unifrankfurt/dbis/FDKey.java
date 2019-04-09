@@ -51,18 +51,10 @@ public class FDKey implements Iterable<String> {
     }
 
 
-    public Object[] toArray() {
-        return this.set.toArray();
+    public String[] toArray() {
+        return this.set.toArray(new String[0]);
     }
 
-    public <T> T[] toArray(T[] ts) {
-        return this.set.toArray(ts);
-    }
-
-
-    public boolean containsAll(Collection<String> collection) {
-        return this.set.containsAll(collection);
-    }
 
 
     /**
